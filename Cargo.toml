@@ -1,0 +1,12 @@
+[package]
+name = "simple-ca"
+version = "0.1.0"
+authors = ["Feng Qiu <grerlrr@gmail.com>"]
+
+[dependencies]
+failure = "0.1.1"
+openssl = "0.10.5"
+serde = "1.0"
+serde_derive = "1.0"
+toml = "0.4"
+clap = "2.30"
