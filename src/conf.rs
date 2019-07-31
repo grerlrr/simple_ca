@@ -1,14 +1,9 @@
-use std::env;
-use std::fs;
-use std::fs::File;
+use std::fs::{self, File};
 use std::path::{Path, PathBuf};
 use std::io::{Error as IOError, ErrorKind as IOErrorKind, Read, Write};
-
 use failure::Error;
-use toml;
-
-use Name;
-use err::SimpleCAError;
+use crate::Name;
+use crate::err::SimpleCAError;
 
 const CONFIG_DIR: &'static str = ".simple_ca";
 const CONFIG_FILE: &'static str = "config";
@@ -16,7 +11,7 @@ const CONFIG_FILE: &'static str = "config";
 fn ensure_dir(dir: &PathBuf) -> Result<(), IOError> {
   if dir.exists() {
     if dir.is_file() {
-      return Err(IOError::new(
+      return Err( IOError::new(
         IOErrorKind::AlreadyExists,
         format!("Can create dir {}", dir.to_string_lossy()),
       ));
@@ -28,7 +23,7 @@ fn ensure_dir(dir: &PathBuf) -> Result<(), IOError> {
 }
 
 pub fn home_dir() -> Result<PathBuf, SimpleCAError> {
-  match env::home_dir() {
+  match dirs::home_dir() {
     Some(dir) => Ok(dir),
     None => Err(SimpleCAError::GenericError {
       msg: "Unable to locate home directory.",

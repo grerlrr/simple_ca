@@ -1,16 +1,21 @@
 [package]
 name = "simple-ca"
 version = "0.1.0"
-authors = ["Feng Qiu <grerlrr@gmail.com>"]
+authors = ["Grerlrr <grerlrr@gmail.com>"]
+edition = "2018"
 
 [dependencies]
-failure = "0.1.1"
-openssl = "0.10.5"
+failure = "0.1"
+openssl = "0.10"
 serde = "1.0"
 serde_derive = "1.0"
 toml = "0.4"
-clap = "2.30"
+clap = "2.33"
+dirs = "2.0"
 
 [profile.release]
 lto = true
 panic = 'abort'
+debug = false
+rpath = false
+debug-assertions = false

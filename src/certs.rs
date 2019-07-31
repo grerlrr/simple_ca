@@ -5,7 +5,7 @@ use openssl::nid::Nid;
 use openssl::x509::{X509, X509Builder, X509Extension, X509Ref};
 use openssl::x509::extension;
 
-use cert_params::CertParams;
+use crate::cert_params::CertParams;
 
 pub fn create_cert<EXT>(params: &CertParams, ext: EXT) -> Result<X509, Error>
 where
@@ -144,8 +144,8 @@ mod tests {
   use openssl::rsa::Rsa;
   use openssl::pkey::PKey;
 
-  use Name;
-  use CertParams;
+  use crate::Name;
+  use crate::CertParams;
   use super::*;
   use openssl::x509::X509;
 

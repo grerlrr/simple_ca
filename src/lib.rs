@@ -1,6 +1,3 @@
-extern crate openssl;
-extern crate toml;
-
 #[macro_use]
 extern crate failure;
 

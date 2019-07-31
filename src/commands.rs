@@ -9,12 +9,11 @@ use openssl::rsa::Rsa;
 use openssl::pkey::{PKey, Private};
 use openssl::x509::{X509, X509Name};
 
-use conf::{CertAuthConf, Conf};
-use name::Name;
-use cert_params::CertParams;
-use certs::{create_intermediate_ca, create_root_ca, create_server_cert};
-
-use save_file;
+use crate::conf::{CertAuthConf, Conf};
+use crate::name::Name;
+use crate::cert_params::CertParams;
+use crate::certs::{create_intermediate_ca, create_root_ca, create_server_cert};
+use crate::save_file;
 
 fn read_file(path: &Path) -> Result<Vec<u8>, io::Error> {
   let mut content = Vec::new();
