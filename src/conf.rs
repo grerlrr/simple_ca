@@ -67,12 +67,23 @@ macro_rules! file_name_getter {
 }
 
 fn reversed_domain(domain: &str) -> String {
-  domain.split(".")
-    .collect::<Vec<&str>>()
-    .into_iter()
-    .rev()
-    .collect::<Vec<&str>>()
-    .join(".")
+  if domain.parse::<std::net::SocketAddr>().is_ok() {
+    domain.to_owned()
+  } else {
+    let port_pos = domain.find(':');
+    let port = port_pos.map(|i| (&domain[i..])).unwrap_or("");
+    let domain = port_pos.map(|i| &domain[..i]).unwrap_or(domain);
+
+    let mut result = domain.split(".")
+      .collect::<Vec<&str>>()
+      .into_iter()
+      .rev()
+      .collect::<Vec<&str>>()
+      .join(".");
+
+    result.push_str(port);
+    result
+  }
 }
 
 fn opt_value(opt: &Option<String>, default: &str) -> String {
