@@ -28,12 +28,12 @@ where
     let issuer = params.issuer();
     builder.set_issuer_name(&issuer.name)?;
 
-    builder.sign(&issuer.pkey, MessageDigest::sha256())?;
-
     let mut extensions = ext(&builder)?;
     for extension in extensions.drain(..) {
         builder.append_extension(extension)?;
     }
+
+    builder.sign(&issuer.pkey, MessageDigest::sha256())?;
 
     Ok(builder.build())
 }
@@ -67,11 +67,12 @@ pub fn create_intermediate_ca(params: &CertParams, root_ca_cert: &X509Ref) -> Re
         let sub_key_id = extension::SubjectKeyIdentifier::new().build(&ctx)?;
         let auth_key_id = extension::AuthorityKeyIdentifier::new()
             .keyid(true)
+            .issuer(true)
             .build(&ctx)?;
         let bc = extension::BasicConstraints::new()
-            .critical()
+            //.critical()
             .ca()
-            .pathlen(0)
+            //.pathlen(0)
             .build()?;
         let key_usage = extension::KeyUsage::new()
             .digital_signature()
@@ -96,7 +97,7 @@ pub fn create_server_cert(params: &CertParams, intermediate_cert: &X509Ref) -> R
         let bc = extension::BasicConstraints::new().build()?;
 
         let key_usage = extension::KeyUsage::new()
-            .critical()
+            // .critical()
             .digital_signature()
             .non_repudiation()
             .key_encipherment()
@@ -209,17 +210,20 @@ mod tests {
             &server_key,
             &intermediate_name,
             &intermediate_key,
+            // &root_name,
+            // &root_key,
             370,
             &vec!["*.another.com"],
         )
         .unwrap();
-        let server_ca = create_server_cert(&server_params, &intermediate_ca).unwrap();
+        let server_cert = create_server_cert(&server_params, &intermediate_ca).unwrap();
+        // let server_cert = create_server_cert(&server_params, &root_ca).unwrap();
 
         write_file_unwrapped!(
             &server_key.private_key_to_pem_pkcs8().unwrap(),
             "target/server.key.pem"
         );
-        write_file_unwrapped!(&server_ca.to_pem().unwrap(), "target/server.cert.pem");
+        write_file_unwrapped!(&server_cert.to_pem().unwrap(), "target/server.cert.pem");
     }
 
 }

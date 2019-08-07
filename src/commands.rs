@@ -95,7 +95,7 @@ pub fn load_ca(reset: bool, verbose: bool) -> Result<(X509, PKey<Private>, X509N
         if intermediate_create {
             write_file!(
                 &intermediate_pkey.private_key_to_pem_pkcs8()?,
-                &ca_key_path,
+                &intermediate_key_path,
                 verbose,
                 "Saved Intermediate private key at: {:?}"
             );
