@@ -1,5 +1,7 @@
-#[derive(Debug, Fail)]
+use thiserror::Error;
+
+#[derive(Debug, Error)]
 pub enum SimpleCAError {
-    #[fail(display = "{}", msg)]
+    #[error("{msg}")]
     GenericError { msg: &'static str },
 }

@@ -3,7 +3,7 @@ use std::io;
 use std::io::{Read, Write};
 use std::path::Path;
 
-use failure::Error;
+use anyhow::Result;
 
 use openssl::pkey::{PKey, Private};
 use openssl::rsa::Rsa;
@@ -23,7 +23,7 @@ fn read_file(path: &Path) -> Result<Vec<u8>, io::Error> {
     Ok(content)
 }
 
-fn get_pkey(generate: bool, path: &Path, bits: u32) -> Result<PKey<Private>, Error> {
+fn get_pkey(generate: bool, path: &Path, bits: u32) -> Result<PKey<Private>> {
     let pkey = if generate {
         let rsa = Rsa::generate(bits)?;
         PKey::from_rsa(rsa)?
@@ -34,9 +34,9 @@ fn get_pkey(generate: bool, path: &Path, bits: u32) -> Result<PKey<Private>, Err
     Ok(pkey)
 }
 
-fn get_x509<T>(generate: bool, path: &Path, create: T) -> Result<X509, Error>
+fn get_x509<T>(generate: bool, path: &Path, create: T) -> Result<X509>
 where
-    T: Fn() -> Result<X509, Error>,
+    T: Fn() -> Result<X509>,
 {
     let x509 = if generate {
         let ca = create()?;
@@ -49,7 +49,7 @@ where
     Ok(x509)
 }
 
-pub fn load_ca(reset: bool, verbose: bool) -> Result<(X509, PKey<Private>, X509Name), Error> {
+pub fn load_ca(reset: bool, verbose: bool) -> Result<(X509, PKey<Private>, X509Name)> {
     let conf = Conf::load()?;
 
     let ca_key_path = CertAuthConf::ca_key()?;
@@ -128,7 +128,7 @@ pub fn generate_server_cert(
     name: &Name,
     alt_names: &Vec<&str>,
     verbose: bool,
-) -> Result<(), Error> {
+) -> Result<()> {
     let domain = &name.common_name;
     let name = name.to_x509_name()?;
     let server_key_path = CertAuthConf::server_key(domain)?;

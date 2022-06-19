@@ -1,9 +1,12 @@
-use crate::err::SimpleCAError;
-use crate::Name;
-use failure::Error;
 use std::fs::{self, File};
 use std::io::{Error as IOError, ErrorKind as IOErrorKind, Read, Write};
 use std::path::{Path, PathBuf};
+
+use anyhow::Result;
+use serde::{Deserialize, Serialize};
+
+use crate::err::SimpleCAError;
+use crate::Name;
 
 const CONFIG_DIR: &'static str = ".simple_ca";
 const CONFIG_FILE: &'static str = "config";
@@ -31,16 +34,16 @@ pub fn home_dir() -> Result<PathBuf, SimpleCAError> {
     }
 }
 
-fn file_in_conf(name: &str) -> Result<PathBuf, Error> {
+fn file_in_conf(name: &str) -> Result<PathBuf> {
     let mut path = home_dir()?;
     path.push(CONFIG_DIR);
     path.push(name);
     Ok(path)
 }
 
-pub fn with_config_dir<T, RT>(process: T) -> Result<RT, Error>
+pub fn with_config_dir<T, RT>(process: T) -> Result<RT>
 where
-    T: Fn(PathBuf) -> Result<RT, Error>,
+    T: Fn(PathBuf) -> Result<RT>,
 {
     let mut home_path = home_dir()?;
     home_path.push(CONFIG_DIR);
@@ -60,7 +63,7 @@ pub struct CertAuthConf {
 
 macro_rules! file_name_getter {
     ($fn_name:ident, $f_name:expr) => {
-        pub fn $fn_name() -> Result<PathBuf, Error> {
+        pub fn $fn_name() -> Result<PathBuf> {
             file_in_conf($f_name)
         }
     };
@@ -109,11 +112,11 @@ impl CertAuthConf {
     file_name_getter!(intermediate_key, "intermediate.key.pem");
     file_name_getter!(intermediate_cert, "intermediate.cert.pem");
 
-    pub fn server_key(domain: &str) -> Result<PathBuf, Error> {
+    pub fn server_key(domain: &str) -> Result<PathBuf> {
         file_in_conf(&format!("{}.key.pem", reversed_domain(domain)))
     }
 
-    pub fn server_cert(domain: &str) -> Result<PathBuf, Error> {
+    pub fn server_cert(domain: &str) -> Result<PathBuf> {
         file_in_conf(&format!("{}.cert.pem", reversed_domain(domain)))
     }
 
@@ -147,7 +150,7 @@ impl Conf {
         }
     }
 
-    pub fn load() -> Result<Conf, Error> {
+    pub fn load() -> Result<Conf> {
         with_config_dir(|mut dir| {
             dir.push(CONFIG_FILE);
             let config_path = dir;
@@ -159,7 +162,7 @@ impl Conf {
         self.ca.as_ref().unwrap()
     }
 
-    pub fn load_config(path: &Path) -> Result<Conf, Error> {
+    pub fn load_config(path: &Path) -> Result<Conf> {
         if path.exists() {
             let mut config_str = String::new();
             let mut f = File::open(path)?;
@@ -174,7 +177,7 @@ impl Conf {
         }
     }
 
-    pub fn save(&self, path: &Path) -> Result<(), Error> {
+    pub fn save(&self, path: &Path) -> Result<()> {
         let content = toml::to_string_pretty(self)?;
         let mut f = File::create(path)?;
         f.write_all(content.as_bytes())?;

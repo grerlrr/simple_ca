@@ -13,7 +13,7 @@ fn main() {
         .subcommand(
             SubCommand::with_name("ca")
                 .about("Regenerate CA certificates")
-                .arg(Arg::with_name("v").short("v").help("Sets verbose mode")),
+                .arg(Arg::with_name("v").short('v').help("Sets verbose mode")),
         )
         .subcommand(
             SubCommand::with_name("server")
@@ -38,7 +38,7 @@ fn main() {
           --org-unit=[NAME] 'Organization unit field of the certificate'
           ",
                 )
-                .arg(Arg::with_name("v").short("v").help("Sets verbose put mode")),
+                .arg(Arg::with_name("v").short('v').help("Sets verbose put mode")),
         )
         .get_matches();
 

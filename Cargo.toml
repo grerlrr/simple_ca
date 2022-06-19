@@ -1,17 +1,17 @@
 [package]
 name = "simple-ca"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["Grerlrr <grerlrr@gmail.com>"]
-edition = "2018"
+edition = "2021"
 
 [dependencies]
-failure = "0.1"
+anyhow = "1"
+clap = "3.1"
+dirs = "4.0"
 openssl = { version = "0.10", features = ["vendored"] }
-serde = "1.0"
-serde_derive = "1.0"
-toml = "0.4"
-clap = "2.33"
-dirs = "2.0"
+serde = { version = "1.0", features = ["derive"] }
+thiserror = "1"
+toml = "0.5"
 
 [profile.release]
 lto = true

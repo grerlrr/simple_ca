@@ -1,4 +1,4 @@
-use failure::Error;
+use anyhow::Result;
 
 use openssl::hash::MessageDigest;
 use openssl::nid::Nid;
@@ -7,9 +7,9 @@ use openssl::x509::{X509Builder, X509Extension, X509Ref, X509};
 
 use crate::cert_params::CertParams;
 
-pub fn create_cert<EXT>(params: &CertParams, ext: EXT) -> Result<X509, Error>
+pub fn create_cert<EXT>(params: &CertParams, ext: EXT) -> Result<X509>
 where
-    EXT: Fn(&X509Builder) -> Result<Vec<X509Extension>, Error>,
+    EXT: Fn(&X509Builder) -> Result<Vec<X509Extension>>,
 {
     let mut builder = X509Builder::new()?;
 
@@ -38,7 +38,7 @@ where
     Ok(builder.build())
 }
 
-pub fn create_root_ca(params: &CertParams) -> Result<X509, Error> {
+pub fn create_root_ca(params: &CertParams) -> Result<X509> {
     let cert = create_cert(params, |builder| {
         let ctx = builder.x509v3_context(None, None);
         let sub_key_id = extension::SubjectKeyIdentifier::new().build(&ctx)?;
@@ -61,7 +61,7 @@ pub fn create_root_ca(params: &CertParams) -> Result<X509, Error> {
     })
 }
 
-pub fn create_intermediate_ca(params: &CertParams, root_ca_cert: &X509Ref) -> Result<X509, Error> {
+pub fn create_intermediate_ca(params: &CertParams, root_ca_cert: &X509Ref) -> Result<X509> {
     create_cert(params, |builder| {
         let ctx = builder.x509v3_context(Some(root_ca_cert), None);
         let sub_key_id = extension::SubjectKeyIdentifier::new().build(&ctx)?;
@@ -83,7 +83,7 @@ pub fn create_intermediate_ca(params: &CertParams, root_ca_cert: &X509Ref) -> Re
     })
 }
 
-pub fn create_server_cert(params: &CertParams, intermediate_cert: &X509Ref) -> Result<X509, Error> {
+pub fn create_server_cert(params: &CertParams, intermediate_cert: &X509Ref) -> Result<X509> {
     create_cert(params, |builder| {
         let ctx = builder.x509v3_context(Some(intermediate_cert), None);
 
